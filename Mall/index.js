@@ -2,10 +2,8 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
-const goodsRouter = require("./routes/goods");
 const usersRouter = require("./routes/users");
-
-const mongoose = require("mongoose");
+const goodsRouter = require("./routers/goods");
 // **************미들웨어
 
 app.use(express.urlencoded({ extended: false }));
@@ -21,14 +19,26 @@ app.set("view engine", "ejs");
 
 // ************** EJS
 
-app.get("/mongodb", async (req, res) => {
-  await mongoose.connect("mongodb://localhost/voyage", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+const connect = require("./schemas");
+connect();
 
-  res.send("ok");
-});
+// app.get("/mongodb", async (req, res) => {
+//   const connect = require("./schemas");
+//   connect();
+
+//   let Goods = require("./schemas/goods");
+
+//   await Goods.create({
+//     goodsId: 1,
+//     name: "맛있는 저녁이당",
+//     thumbnailUrl:
+//       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKRQ3NDs5bjulPr3JaXJzP7DH3Y-71WX9wzQ7N8XD9KLUHjT6L&usqp=CAc",
+//     category: "food",
+//     price: 15000,
+//   });
+
+//   res.send("ok");
+// });
 
 // useFindAndModify: true,
 // useCreateIndex: true,
@@ -67,9 +77,19 @@ app.get("/detail", (req, res) => {
   res.render("detail");
 });
 
-app.use("/goods", goodsRouter);
+// app.use("/goods", goodsRouter);
 
 app.use("/users", usersRouter);
+
+app.use("/api", [goodsRouter]);
+
+app.get("/cart", (req, res) => {
+  res.render("cart");
+});
+
+app.get("/order", (req, res) => {
+  res.render("order");
+});
 
 app.listen(port, () => {
   console.log(`listening at http://localhost:${port}`);
